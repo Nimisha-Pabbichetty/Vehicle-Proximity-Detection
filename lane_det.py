@@ -62,14 +62,20 @@ while (cap.isOpened() and currentframe<2000):
     data = lane_detect.preprocess(img)
     data['lanes'] = lane_detect.inference(data)[0]
     lanes = [lane.to_array(lane_cfg) for lane in data['lanes']]
+    #print('x')
     if not lanes:
       lanes=prev
     for lane in lanes:
-        for x, y in lane:
-            if x <= 0 or y <= 0:
+        #for x, y in lane:
+        for i in range(len(lane)-2):
+            start_x, start_y = lane[i]
+            end_x, end_y = lane[i+1]
+            if start_x <= 0 or start_y <= 0 or end_x <= 0 or end_y <= 0:
                 continue
-            x, y = int(x), int(y)
-            cv2.circle(data['ori_img'], (x, y), 4, (255, 0, 0), 2)
+            start_x, start_y = int(start_x), int(start_y)
+            end_x, end_y = int(end_x), int(end_y)
+            cv2.line(data['ori_img'], (start_x, start_y),(end_x, end_y), (255, 0, 0), 2) 
+            cv2.circle(data['ori_img'], (start_x, start_y), 4, (0, 255, 0), 2)
     prev=lanes
     currentframe += 1
     fps.update()
